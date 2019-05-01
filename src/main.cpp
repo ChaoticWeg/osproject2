@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <queue>
+#include <iostream>
 
 #include <cpu.h>
 #include <process.h>
@@ -18,10 +19,31 @@ int main() {
     RunQueue runQueue;
 
     // generate processes
-    std::queue<Process*> procs; // vector of process to be scheduled every 50 cycles
+    std::vector<Process*> procs; // all processes
+    std::queue<Process*> unscheduledProcs; // vector of process to be scheduled every 50 cycles
     for (int i = 0; i < PROC_COUNT; i++) {
-        procs.push(Process::generate());
+        Process* p = Process::generate();
+        procs.push_back(p);
+        unscheduledProcs.push(p);
     }
+
+    // calculate the total amount of memory in bytes
+    unsigned long totalMemory = 0;
+    for (Process* p : procs) {
+        totalMemory += p->mem();
+    }
+
+    // prompt the user to specify the size of memory in bytes
+    unsigned long maxMemory = 0;
+    while (maxMemory == 0) {
+        printf("Required memory:  %lu\n", totalMemory);
+
+        printf("Available memory: ");
+        char maxMemoryStr[256];
+        std::cin >> maxMemoryStr;
+        maxMemory = strtoul(maxMemoryStr, nullptr, 10);
+    }
+    printf("\n");
 
     // print header
     printf(PROC_HEADER_FORMAT, "Event", "PID", "Cycle", "CPU", "Memory");
@@ -40,10 +62,10 @@ int main() {
 
         // a process arrives if current cycle is a multiple of PROC_ARRIVAL_INTERVAL and there is a process to arrive
         if (cpu.get_current_cycle() % PROC_ARRIVAL_INTERVAL == 0 && !procs.empty()) {
-            Process* p = procs.front();
+            Process* p = unscheduledProcs.front();
             print_proc_event("ARRIVE", p, &cpu);
-            runQueue.push(procs.front());
-            procs.pop();
+            runQueue.push(unscheduledProcs.front());
+            unscheduledProcs.pop();
         }
 
         // run a process in the runqueue if the CPU is idle and there is something to run
