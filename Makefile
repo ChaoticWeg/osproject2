@@ -7,12 +7,12 @@ INCDIR=./include
 LIBDIR=./lib
 SRCDIR=./src
 
-.PHONY: dirs all
+.PHONY: dirs all clean
 
-all: dirs main
+all: clean dirs main
 
-main: $(LIBDIR)/libprocess.so $(SRCDIR)/cpu.cpp $(SRCDIR)/runqueue.cpp $(SRCDIR)/main.cpp
-	$(CC) $(CFLAGS) -I$(INCDIR) -L$(LIBDIR) -lprocess -o $@ $(SRCDIR)/cpu.cpp $(SRCDIR)/runqueue.cpp $(SRCDIR)/main.cpp
+main: $(LIBDIR)/libprocess.so $(SRCDIR)/memory.cpp $(SRCDIR)/cpu.cpp $(SRCDIR)/runqueue.cpp $(SRCDIR)/main.cpp
+	$(CC) $(CFLAGS) -I$(INCDIR) -L$(LIBDIR) -lprocess -o $@ $(SRCDIR)/cpu.cpp $(SRCDIR)/runqueue.cpp $(SRCDIR)/memory.cpp $(SRCDIR)/main.cpp
 
 $(LIBDIR)/libprocess.so: $(SRCDIR)/process.cpp
 	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
@@ -20,3 +20,7 @@ $(LIBDIR)/libprocess.so: $(SRCDIR)/process.cpp
 dirs:
 	-@mkdir -p lib
 
+clean:
+	-@rm -rf $(LIBDIR)
+	-@rm -f main
+	-@make dirs
