@@ -5,11 +5,6 @@ MemoryManager::MemoryManager(unsigned long maxBytes){
 }
 
 bool RealMemoryManager::malloc(Process *p) {
-    if (p->memory_usage > this->freeBytes) { // memory usage exceeds free bytes
-        return false;
-    }
-
-    // try to actually allocate memory
     void* memory = ::malloc(p->memory_usage);
     if (memory != nullptr) { // allocation succeeded
         p->memory_ptr = memory;
@@ -21,8 +16,8 @@ bool RealMemoryManager::malloc(Process *p) {
 
 void RealMemoryManager::free(Process *p) {
     if (p->memory_ptr != nullptr) {
+        ::free(p->memory_ptr);
         p->memory_ptr = nullptr;
-        this->freeBytes += p->memory_usage;
     }
 }
 
