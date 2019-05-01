@@ -1,5 +1,3 @@
-#include <process.h>
-
 #include <cstdlib>
 #include <ctime>
 #include <random>
@@ -7,6 +5,8 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <process.h>
 
 int Process::lastPid = 0;
 
@@ -27,6 +27,6 @@ unsigned long Process::gen_ulong(unsigned long min, unsigned long max) {
 
 std::string Process::to_string() {
     std::stringstream ss;
-    ss << _pid << "," << _cpu << "," << _mem;
+    ss << pid << "," << cpu_cycles << "," << memory_usage;
     return ss.str();
 }

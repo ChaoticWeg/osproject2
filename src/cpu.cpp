@@ -27,5 +27,5 @@ Process *CPU::get_process() {
 
 void CPU::run(Process* p) {
     this->process = p;
-    this->remainingCycles = p->cpu();
+    this->remainingCycles = p->get_cpu_cycles();
 }

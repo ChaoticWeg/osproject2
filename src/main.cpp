@@ -4,6 +4,7 @@
 
 #include <cpu.h>
 #include <process.h>
+#include <memory.h>
 #include <runqueue.h>
 
 const int PROC_COUNT = 50; // number of processes to generate
@@ -30,20 +31,22 @@ int main() {
     // calculate the total amount of memory in bytes
     unsigned long totalMemory = 0;
     for (Process* p : procs) {
-        totalMemory += p->mem();
+        totalMemory += p->get_memory_usage();
     }
 
     // prompt the user to specify the size of memory in bytes
     unsigned long maxMemory = 0;
+    printf("Required memory:  %lu\n", totalMemory);
     while (maxMemory == 0) {
-        printf("Required memory:  %lu\n", totalMemory);
-
         printf("Available memory: ");
         char maxMemoryStr[256];
         std::cin >> maxMemoryStr;
         maxMemory = strtoul(maxMemoryStr, nullptr, 10);
     }
     printf("\n");
+
+    // create a memory manager
+    MemoryManager memory(maxMemory);
 
     // print header
     printf(PROC_HEADER_FORMAT, "Event", "PID", "Cycle", "CPU", "Memory");
@@ -71,14 +74,18 @@ int main() {
         // run a process in the runqueue if the CPU is idle and there is something to run
         if (cpu.get_process() == nullptr && runQueue.size() > 0) {
             Process *p = runQueue.pop();
-            print_proc_event("START", p, &cpu);
-            cpu.run(p);
+            if (memory.malloc(p)) {
+                print_proc_event("MALLOC", p, &cpu);
+                print_proc_event("START", p, &cpu);
+                cpu.run(p);
+            }
         }
 
         // advance the cpu to next cycle
         Process* currentProcess = cpu.get_process();
         cpu.advance(nextCycle);
-        if (cpu.get_process() != currentProcess) {
+        if (currentProcess != nullptr && cpu.get_remaining_cycles() == 0) {
+            memory.free(currentProcess);
             print_proc_event("END", currentProcess, &cpu);
         }
     }
@@ -87,5 +94,6 @@ int main() {
 }
 
 void print_proc_event(const std::string &event, Process* p, CPU* cpu) {
-    printf(PROC_ROW_FORMAT, event.c_str(), p->pid(), cpu->get_current_cycle(), p->cpu(), p->mem());
+    printf(PROC_ROW_FORMAT, event.c_str(), p->get_pid(), cpu->get_current_cycle(), p->get_cpu_cycles(),
+           p->get_memory_usage());
 }
