@@ -14,7 +14,7 @@ const int PROC_ARRIVAL_INTERVAL = 50; // number of cycles after which to a proce
 const char PROC_HEADER_FORMAT[] = "%6s  %3s  %10s  %10s  %10s\n";
 const char PROC_ROW_FORMAT[] = "%6s  %3i  %10lu  %10lu  %10lu\n";
 
-bool confirm(const std::string &message, bool defaultValue = false);
+unsigned long choice(const std::string& message, const std::vector<std::string>& choices);
 void print_proc_event(const std::string &event, Process* p, CPU* cpu);
 
 int main() {
@@ -22,17 +22,17 @@ int main() {
     RunQueue runQueue;
 
     // generate processes
-    std::vector<Process*> procs; // all processes
-    std::queue<Process*> unscheduledProcs; // vector of process to be scheduled every 50 cycles
+    std::vector<Process *> procs; // all processes
+    std::queue<Process *> unscheduledProcs; // vector of process to be scheduled every 50 cycles
     for (int i = 0; i < PROC_COUNT; i++) {
-        Process* p = Process::generate();
+        Process *p = Process::generate();
         procs.push_back(p);
         unscheduledProcs.push(p);
     }
 
     // calculate the total amount of memory in bytes
     unsigned long totalMemory = 0;
-    for (Process* p : procs) {
+    for (Process *p : procs) {
         totalMemory += p->get_memory_usage();
     }
 
@@ -48,11 +48,17 @@ int main() {
     printf("\n");
 
     // create a memory manager
-    MemoryManager* memory;
-    if (confirm("Use complex memory manager?")) {
-        memory = new ComplexMemoryManager(maxMemory);
-    } else {
-        memory = new SimpleMemoryManager(maxMemory);
+    MemoryManager *memory;
+    unsigned long memoryManagerChoice = choice("Select a memory manager:", {"Real", "Simple", "Complex"});
+    switch (memoryManagerChoice) {
+        case 0:
+            memory = new RealMemoryManager(maxMemory);
+            break;
+        case 1:
+            memory = new ComplexMemoryManager(maxMemory);
+            break;
+        default:
+            memory = new SimpleMemoryManager(maxMemory);
     }
 
     // print header
@@ -107,21 +113,28 @@ void print_proc_event(const std::string &event, Process* p, CPU* cpu) {
            p->get_memory_usage());
 }
 
-bool confirm(const std::string &message, bool defaultValue) {
-    if (defaultValue) {
-        printf("%s [Y/n] ", message.c_str());
-    } else {
-        printf("%s [y/N] ", message.c_str());
-    }
-    fflush(stdout);
+unsigned long choice(const std::string& message, const std::vector<std::string>& choices) {
 
-    char response[256];
-    scanf("%s", response);
-    if (strcmp(response, "Y") == 0 || strcmp(response, "y") == 0) {
-        return true;
-    } else if (strcmp(response, "N") == 0 || strcmp(response, "n") == 0) {
-        return false;
-    } else {
-        return defaultValue;
+    // print choices
+    printf("%s\n", message.c_str());
+    for (unsigned long i = 0; i < choices.size(); i++) {
+        printf("%lu) %s\n", i + 1, choices[i].c_str());
     }
+
+    // prompt for response
+    unsigned long val = 0;
+    while (val == 0) {
+        printf("?) ");
+        fflush(stdout);
+
+        char response[256];
+        std::cin >> response;
+        val = strtoul(response, nullptr, 10);
+
+        if (val > choices.size()) {
+            val = 0;
+        }
+    }
+    printf("\n");
+    return val - 1;
 }

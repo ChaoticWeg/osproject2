@@ -1,10 +1,10 @@
 #include <memory.h>
 
-SimpleMemoryManager::SimpleMemoryManager(unsigned long maxBytes) {
+MemoryManager::MemoryManager(unsigned long maxBytes){
     this->freeBytes = maxBytes;
 }
 
-bool SimpleMemoryManager::malloc(Process *p) {
+bool RealMemoryManager::malloc(Process *p) {
     if (p->memory_usage > this->freeBytes) { // memory usage exceeds free bytes
         return false;
     }
@@ -19,15 +19,20 @@ bool SimpleMemoryManager::malloc(Process *p) {
     }
 }
 
-void SimpleMemoryManager::free(Process *p) {
+void RealMemoryManager::free(Process *p) {
     if (p->memory_ptr != nullptr) {
         p->memory_ptr = nullptr;
         this->freeBytes += p->memory_usage;
     }
 }
 
-ComplexMemoryManager::ComplexMemoryManager(unsigned long maxBytes) {
-    this->freeBytes = maxBytes;
+bool SimpleMemoryManager::malloc(Process *p) {
+    // TODO: TBI
+    return false;
+}
+
+void SimpleMemoryManager::free(Process *p) {
+    // TODO: TBI
 }
 
 bool ComplexMemoryManager::malloc(Process *p) {

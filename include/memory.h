@@ -3,37 +3,50 @@
 
 #include <process.h>
 
+
 class MemoryManager {
 
 public:
+    explicit MemoryManager(unsigned long maxBytes);
+
     virtual bool malloc(Process* p) = 0;
     virtual void free(Process* p) = 0;
 
+protected:
+    unsigned long freeBytes;
+
 };
+
+
+class RealMemoryManager : public MemoryManager {
+
+public:
+    using MemoryManager::MemoryManager;
+
+    bool malloc(Process* p) override;
+    void free(Process* p) override;
+
+};
+
 
 class SimpleMemoryManager : public MemoryManager {
 
 public:
-    explicit SimpleMemoryManager(unsigned long maxBytes);
+    using MemoryManager::MemoryManager;
 
     bool malloc(Process* p) override;
     void free(Process* p) override;
 
-private:
-    unsigned long freeBytes;
-
 };
+
 
 class ComplexMemoryManager : public MemoryManager {
 
 public:
-    explicit ComplexMemoryManager(unsigned long maxBytes);
+    using MemoryManager::MemoryManager;
 
     bool malloc(Process* p) override;
     void free(Process* p) override;
-
-private:
-    unsigned long freeBytes;
 
 };
 
