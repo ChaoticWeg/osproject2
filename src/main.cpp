@@ -49,7 +49,7 @@ int main() {
     printf(PROC_HEADER_FORMAT, "Event", "PID", "Cycle", "CPU", "Memory");
 
     // simulate cpu cycles
-    while (runQueue.size() > 0 || !procs.empty()) { // stop the simulation when no processes remain
+    while (runQueue.size() > 0 || !unscheduledProcs.empty()) { // stop the simulation when no processes remain
 
         // determine what the next cycle to advance to will be
         unsigned long nextCycle = (cpu.get_current_cycle() - (cpu.get_current_cycle() % PROC_ARRIVAL_INTERVAL)
@@ -61,7 +61,7 @@ int main() {
         }
 
         // a process arrives if current cycle is a multiple of PROC_ARRIVAL_INTERVAL and there is a process to arrive
-        if (cpu.get_current_cycle() % PROC_ARRIVAL_INTERVAL == 0 && !procs.empty()) {
+        if (cpu.get_current_cycle() % PROC_ARRIVAL_INTERVAL == 0 && !unscheduledProcs.empty()) {
             Process* p = unscheduledProcs.front();
             print_proc_event("ARRIVE", p, &cpu);
             runQueue.push(unscheduledProcs.front());
