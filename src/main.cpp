@@ -14,6 +14,7 @@ const int PROC_ARRIVAL_INTERVAL = 50; // number of cycles after which to a proce
 const char PROC_HEADER_FORMAT[] = "%6s  %3s  %10s  %10s  %10s\n";
 const char PROC_ROW_FORMAT[] = "%6s  %3i  %10lu  %10lu  %10lu\n";
 
+bool confirm(const std::string &message, bool defaultValue = false);
 void print_proc_event(const std::string &event, Process* p, CPU* cpu);
 
 int main() {
@@ -48,10 +49,8 @@ int main() {
 
     // create a memory manager
     MemoryManager* memory;
-    bool shouldUseComplexManager = false;
-    if (shouldUseComplexManager) {
-        // TODO: use complex manager
-        return 1;
+    if (confirm("Use complex memory manager?")) {
+        memory = new ComplexMemoryManager(maxMemory);
     } else {
         memory = new SimpleMemoryManager(maxMemory);
     }
@@ -86,6 +85,8 @@ int main() {
                 print_proc_event("MALLOC", p, &cpu);
                 print_proc_event("START", p, &cpu);
                 cpu.run(p);
+            } else {
+                print_proc_event("FAILED", p, &cpu);
             }
         }
 
@@ -104,4 +105,23 @@ int main() {
 void print_proc_event(const std::string &event, Process* p, CPU* cpu) {
     printf(PROC_ROW_FORMAT, event.c_str(), p->get_pid(), cpu->get_current_cycle(), p->get_cpu_cycles(),
            p->get_memory_usage());
+}
+
+bool confirm(const std::string &message, bool defaultValue) {
+    if (defaultValue) {
+        printf("%s [Y/n] ", message.c_str());
+    } else {
+        printf("%s [y/N] ", message.c_str());
+    }
+    fflush(stdout);
+
+    char response[256];
+    scanf("%s", response);
+    if (strcmp(response, "Y") == 0 || strcmp(response, "y") == 0) {
+        return true;
+    } else if (strcmp(response, "N") == 0 || strcmp(response, "n") == 0) {
+        return false;
+    } else {
+        return defaultValue;
+    }
 }

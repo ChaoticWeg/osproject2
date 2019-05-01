@@ -25,3 +25,16 @@ void SimpleMemoryManager::free(Process *p) {
         this->freeBytes += p->memory_usage;
     }
 }
+
+ComplexMemoryManager::ComplexMemoryManager(unsigned long maxBytes) {
+    this->freeBytes = maxBytes;
+}
+
+bool ComplexMemoryManager::malloc(Process *p) {
+    // TODO: TBI
+    return false;
+}
+
+void ComplexMemoryManager::free(Process *p) {
+    // TODO: TBI
+}

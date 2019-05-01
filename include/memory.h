@@ -24,6 +24,17 @@ private:
 
 };
 
-class ComplexMemoryManager : MemoryManager {};
+class ComplexMemoryManager : public MemoryManager {
+
+public:
+    explicit ComplexMemoryManager(unsigned long maxBytes);
+
+    bool malloc(Process* p) override;
+    void free(Process* p) override;
+
+private:
+    unsigned long freeBytes;
+
+};
 
 #endif //OSPROJECT2_MEMORY_H
