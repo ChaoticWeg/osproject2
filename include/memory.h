@@ -6,14 +6,24 @@
 class MemoryManager {
 
 public:
-    explicit MemoryManager(unsigned long maxBytes);
+    virtual bool malloc(Process* p) = 0;
+    virtual void free(Process* p) = 0;
 
-    bool malloc(Process* p);
-    void free(Process* p);
+};
+
+class SimpleMemoryManager : public MemoryManager {
+
+public:
+    explicit SimpleMemoryManager(unsigned long maxBytes);
+
+    bool malloc(Process* p) override;
+    void free(Process* p) override;
 
 private:
     unsigned long freeBytes;
 
 };
+
+class ComplexMemoryManager : MemoryManager {};
 
 #endif //OSPROJECT2_MEMORY_H

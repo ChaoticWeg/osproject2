@@ -37,7 +37,8 @@ private:
 
     Process(int p, unsigned long c, unsigned long m) : pid(p), cpu_cycles(c), memory_usage(m) {};
 
-friend class MemoryManager;
+friend class SimpleMemoryManager;
+friend class ComplexMemoryManager;
 
 };
 

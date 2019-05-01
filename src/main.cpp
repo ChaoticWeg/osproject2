@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <queue>
 #include <iostream>
+#include <exception>
 
 #include <cpu.h>
 #include <process.h>
@@ -46,7 +47,14 @@ int main() {
     printf("\n");
 
     // create a memory manager
-    MemoryManager memory(maxMemory);
+    MemoryManager* memory;
+    bool shouldUseComplexManager = false;
+    if (shouldUseComplexManager) {
+        // TODO: use complex manager
+        return 1;
+    } else {
+        memory = new SimpleMemoryManager(maxMemory);
+    }
 
     // print header
     printf(PROC_HEADER_FORMAT, "Event", "PID", "Cycle", "CPU", "Memory");
@@ -74,7 +82,7 @@ int main() {
         // run a process in the runqueue if the CPU is idle and there is something to run
         if (cpu.get_process() == nullptr && runQueue.size() > 0) {
             Process *p = runQueue.pop();
-            if (memory.malloc(p)) {
+            if (memory->malloc(p)) {
                 print_proc_event("MALLOC", p, &cpu);
                 print_proc_event("START", p, &cpu);
                 cpu.run(p);
@@ -85,7 +93,7 @@ int main() {
         Process* currentProcess = cpu.get_process();
         cpu.advance(nextCycle);
         if (currentProcess != nullptr && cpu.get_remaining_cycles() == 0) {
-            memory.free(currentProcess);
+            memory->free(currentProcess);
             print_proc_event("END", currentProcess, &cpu);
         }
     }
