@@ -1,6 +1,10 @@
+# built stuff
+main
+
 # stuff
 .idea/
 cmake-build-debug/
+*.swp
 
 # Prerequisites
 *.d
