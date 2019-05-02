@@ -82,14 +82,12 @@ int main() {
                 p->memory_ptr = alloc;
                 print_proc_event("MALLOC", p, &cpu);
                 runQueue.push(unscheduledProcs.front());
-            } else {
-                if (memoryManagerChoice == 2) {
-                    // complex memory manager queues jobs for later when memory is free
-                    runQueue.wait(p);
-                    print_proc_event("WAIT", p, &cpu);
-                } else {
-                    print_proc_event("FAILED", p, &cpu);
-                }
+            } else if (memoryManagerChoice == 2 && p->get_memory_usage() <= maxMemory) { // complex memory manager
+                // complex memory manager queues jobs for later when memory is free
+                runQueue.wait(p);
+                print_proc_event("WAIT", p, &cpu);
+            } else { // process failed for some other reason (process exceeds max memory, etc.)
+                print_proc_event("FAILED", p, &cpu);
             }
 
             unscheduledProcs.pop();
