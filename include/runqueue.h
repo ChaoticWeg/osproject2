@@ -8,8 +8,12 @@
 class RunQueue {
 
 public:
-    Process*      pop();
+    Process*      pop_ready();
+    Process*      pop_waiting();
+    Process*      peek_waiting();
     void          push(Process *p);
+    void          wait(Process *p);
+    unsigned long wait_count();
     unsigned long size();
 
 private:

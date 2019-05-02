@@ -55,10 +55,14 @@ int main() {
             memory = new RealMemoryManager();
             break;
         case 1:
+        case 2:
             memory = new SimpleMemoryManager(maxMemory);
+            // case 2 is simple memory manager with extra spice handled below
             break;
         default:
-            memory = new ComplexMemoryManager(maxMemory);
+            // invalid
+            printf("invalid choice");
+            return 1;
     }
 
     // print header
@@ -72,21 +76,43 @@ int main() {
             Process* p = unscheduledProcs.front();
             print_proc_event("ARRIVE", p, &cpu);
 
-            // allocate memory for the process
+            // attempt to allocate memory for the process
             void* alloc = memory->malloc(p->get_memory_usage());
             if (alloc != nullptr) {
                 p->memory_ptr = alloc;
                 print_proc_event("MALLOC", p, &cpu);
                 runQueue.push(unscheduledProcs.front());
             } else {
-                print_proc_event("FAILED", p, &cpu);
+                if (memoryManagerChoice == 2) {
+                    // complex memory manager queues jobs for later when memory is free
+                    runQueue.wait(p);
+                    print_proc_event("WAIT", p, &cpu);
+                } else {
+                    print_proc_event("FAILED", p, &cpu);
+                }
             }
+
             unscheduledProcs.pop();
+        }
+
+        // try to advance the first waiting process if there is one
+        if (runQueue.wait_count() > 0) {
+            Process *p = runQueue.peek_waiting();
+            void *alloc = memory->malloc(p->get_memory_usage());
+
+            if (alloc != nullptr) { // we have the meats
+                p = runQueue.pop_waiting();
+                p->memory_ptr = alloc;
+                print_proc_event("MALLOC", p, &cpu);
+                runQueue.push(p);
+            }
+
+            // if malloc failed then don't do anything
         }
 
         // run a process in the runqueue if the CPU is idle and there is something to run
         if (cpu.get_process() == nullptr && runQueue.size() > 0) {
-            Process *p = runQueue.pop();
+            Process *p = runQueue.pop_ready();
             print_proc_event("START", p, &cpu);
             cpu.run(p);
         }
