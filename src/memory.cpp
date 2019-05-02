@@ -96,17 +96,3 @@ Partition *SimpleMemoryManager::find_hole(unsigned long minLen) {
 
     return partition;
 }
-
-
-/*
- * ComplexMemoryManager
- */
-
-void *ComplexMemoryManager::malloc(unsigned long len) {
-    // TODO: TBI
-    return nullptr;
-}
-
-void ComplexMemoryManager::free(void *ptr) {
-    // TODO: TBI
-}
