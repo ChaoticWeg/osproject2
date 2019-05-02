@@ -4,8 +4,8 @@
  * RealMemoryManager
  */
 
-void* RealMemoryManager::malloc(unsigned long len) {
-    void* memory = ::malloc(len);
+void *RealMemoryManager::malloc(unsigned long len) {
+    void *memory = ::malloc(len);
     if (memory != nullptr) { // allocation succeeded
         return memory;
     } else { // allocation failed
@@ -13,7 +13,7 @@ void* RealMemoryManager::malloc(unsigned long len) {
     }
 }
 
-void RealMemoryManager::free(void* ptr) {
+void RealMemoryManager::free(void *ptr) {
     ::free(ptr);
 }
 
@@ -27,10 +27,10 @@ SimpleMemoryManager::SimpleMemoryManager(unsigned long maxBytes) {
     this->memory = ::malloc(maxBytes); // allocate memory for the memory manager
 }
 
-void* SimpleMemoryManager::malloc(unsigned long len) {
+void *SimpleMemoryManager::malloc(unsigned long len) {
 
     // find a hole that fits the process' memory requirements
-    Partition* partition = this->find_hole(len);
+    Partition *partition = this->find_hole(len);
     if (partition == nullptr) { // no such hole exists, failure
         return nullptr;
     }
@@ -48,14 +48,14 @@ void* SimpleMemoryManager::malloc(unsigned long len) {
     }
 
     // return starting address of the allocated memory
-    return (char*)this->memory + partition->offset;
+    return (char *) this->memory + partition->offset;
 }
 
-void SimpleMemoryManager::free(void* ptr) {
-    unsigned long offset = (char*)ptr - (char*)this->memory; // offset of the partition
+void SimpleMemoryManager::free(void *ptr) {
+    unsigned long offset = (char *) ptr - (char *) this->memory; // offset of the partition
 
     // find the partition with this offset
-    unsigned long index = -1;
+    auto index = (unsigned long) -1;
     for (unsigned long i = 0; i < this->table.size(); i++) {
         if (this->table[i]->offset == offset) {
             index = i;
@@ -69,18 +69,18 @@ void SimpleMemoryManager::free(void* ptr) {
     }
 }
 
-Partition* SimpleMemoryManager::find_hole(unsigned long minLen) {
+Partition *SimpleMemoryManager::find_hole(unsigned long minLen) {
     unsigned long len;       // length of the current hole
 
     // try to find a hole
-    Partition* partition = nullptr;
+    Partition *partition = nullptr;
     if (!this->table.empty()) { // table has partitions, find holes between them
         for (unsigned long i = 0; i < this->table.size(); i++) {
-            Partition* compPartition = this->table[i];
+            Partition *compPartition = this->table[i];
 
             // calculate length of hole
             len = (i + 1 < this->table.size() ? this->table[i + 1]->offset : this->maxBytes)
-                    - (compPartition->offset + compPartition->len);
+                  - (compPartition->offset + compPartition->len);
             if (len >= minLen) { // hole meets the min length, build new partition
                 partition = new Partition();
                 partition->offset = compPartition->offset + compPartition->len;
@@ -102,11 +102,11 @@ Partition* SimpleMemoryManager::find_hole(unsigned long minLen) {
  * ComplexMemoryManager
  */
 
-void* ComplexMemoryManager::malloc(unsigned long len) {
+void *ComplexMemoryManager::malloc(unsigned long len) {
     // TODO: TBI
     return nullptr;
 }
 
-void ComplexMemoryManager::free(void* ptr) {
+void ComplexMemoryManager::free(void *ptr) {
     // TODO: TBI
 }

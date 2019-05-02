@@ -69,6 +69,9 @@ protected:
 
 class ComplexMemoryManager : public SimpleMemoryManager {
 
+private:
+    std::vector<Process*> queue; // fifo queue for available memory
+
 public:
     using SimpleMemoryManager::SimpleMemoryManager;
 
