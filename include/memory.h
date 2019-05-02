@@ -1,7 +1,7 @@
 #ifndef OSPROJECT2_MEMORY_H
 #define OSPROJECT2_MEMORY_H
 
-#import <map>
+#include <map>
 
 #include <process.h>
 
