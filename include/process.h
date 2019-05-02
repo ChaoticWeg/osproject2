@@ -7,7 +7,7 @@
 
 // cpu burst time in cycles
 #define PROC_MIN_CPU 10
-#define PROC_MAX_CPU 100
+#define PROC_MAX_CPU 1000
 
 // mem usage in bytes
 #define PROC_MIN_MEM 250
@@ -17,6 +17,8 @@ class Process {
 
 public:
     static Process* generate();
+
+    void* memory_ptr = nullptr;
 
     inline int get_pid() const { return pid; }
     inline unsigned long get_cpu_cycles() const { return cpu_cycles; }
@@ -33,13 +35,8 @@ private:
 
     int pid;
     unsigned long cpu_cycles, memory_usage;
-    void* memory_ptr = nullptr;
 
     Process(int p, unsigned long c, unsigned long m) : pid(p), cpu_cycles(c), memory_usage(m) {};
-
-friend class RealMemoryManager;
-friend class SimpleMemoryManager;
-friend class ComplexMemoryManager;
 
 };
 
