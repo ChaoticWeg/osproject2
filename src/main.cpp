@@ -93,8 +93,9 @@ int main() {
             unscheduledProcs.pop();
         }
 
-        // try to advance the first waiting process if there is one
-        if (runQueue.wait_count() > 0) {
+        // try to advance waiting processes if there are any
+        bool blocked = false;
+        while (runQueue.wait_count() > 0 && !blocked) {
             Process *p = runQueue.peek_waiting();
             void *alloc = memory->malloc(p->get_memory_usage());
 
@@ -103,6 +104,8 @@ int main() {
                 p->memory_ptr = alloc;
                 print_proc_event("MALLOC", p, &cpu);
                 runQueue.push(p);
+            } else {
+                blocked = true;
             }
 
             // if malloc failed then don't do anything
